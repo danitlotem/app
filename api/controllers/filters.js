@@ -119,28 +119,26 @@ module.exports = {
 
   createUserFilter: (req, res) => {
     const userid = req.params.userid;
-    const sexFilter = req.body.sex_filter;
+    const hobbiesFilter = req.body.hobbies_filter;
+    const genderFilter = req.body.gender_filter;
     const relationshipFilter = req.body.relationship_filter;
     const interestingInFilter = req.body.interesting_in_filter;
     const ageFilter = req.body.age_filter;
 
-    console.log(sexFilter);
-    console.log(relationshipFilter);
-    console.log(interestingInFilter);
-    console.log(ageFilter);
-
     mySqlConnection.query(
-      "INSERT INTO Filters (user_id, sex_filter, relationship_filter, interesting_in_filter, age_filter)" +
-        " values (?, ?, ?, ?, ?)" +
-        "ON DUPLICATE KEY UPDATE user_id = ?, sex_filter = ?, relationship_filter = ?, interesting_in_filter = ?, age_filter = ?",
+      "INSERT INTO Filters (user_id, hobbies_filter, gender_filter, relationship_filter, interesting_in_filter, age_filter)" +
+        " values (?, ?, ?, ?, ?, ?)" +
+        "ON DUPLICATE KEY UPDATE user_id = ?",
       [
         userid,
-        sexFilter,
+        hobbiesFilter,
+        genderFilter,
         relationshipFilter,
         interestingInFilter,
         ageFilter,
         userid,
-        sexFilter,
+        hobbiesFilter,
+        genderFilter,
         relationshipFilter,
         interestingInFilter,
         ageFilter,
@@ -156,16 +154,16 @@ module.exports = {
   },
 
   updateUserGenderFilter: (req, res) => {
-    const sexFilter = req.body.sex_filter;
+    const genderFilter = req.body.gender_filter;
     const userid = req.params.userid;
 
     mySqlConnection.query(
-      "UPDATE Filters SET sex_filter = ? WHERE user_id = ?",
-      [sexFilter, userid],
+      "UPDATE Filters SET gender_filter = ? WHERE user_id = ?",
+      [genderFilter, userid],
       (err, result) => {
         try {
           res.send(
-            `User number ${userid} updated sex filter to ${sexFilter} successfully`
+            `User number ${userid} updated gender filter to ${genderFilter} successfully`
           );
         } catch (err) {
           console.log(err.message);
