@@ -76,15 +76,41 @@ module.exports = {
     const lastUpdate = new Date();
     const user_A = req.params.useridA;
     const user_B = req.params.useridB;
-    //const connected = 0;
-    // maybe check if it's mutual and if yes create a parameter connected = 1 if no connected = 0 and put it in the SQL question.
+   
     mySqlConnection.query(
       "INSERT INTO Connections (user_A_id, user_B_id, creation_date, last_update) values (?, ?, ?, ?)" +
         "ON DUPLICATE KEY UPDATE user_A_id = ?, user_B_id = ?, last_update = ?",
       [user_A, user_B, creationDate, lastUpdate, user_A, user_B, lastUpdate],
-      (err, result) => {
+      (err, rows) => {
         try {
-          res.send("connection added successfully");
+          if(typeof rows !== 'undefined') // the insert succeed
+          {
+              mySqlConnection.query(
+                `select * from connections where ((user_A_id = ${user_B} and user_B_id = ${user_A}) or 
+                (user_A_id = ${user_A} and user_B_id = ${user_B}))`,
+                (err, rows) => {
+                  if(rows.length === 2)
+                  {
+                      mySqlConnection.query(
+                        `update connections set connected = 1 where 
+                          ((user_A_id = ${user_A} and user_B_id = ${user_B}) or
+                          (user_A_id = ${user_B} and user_B_id = ${user_A}))`,
+                          (err, rows) => {
+                            try {
+                              res.send(`Congrats! there is a new mutual connection between users ${user_A} and ${user_B}`);
+                            } catch (err) {
+                              console.log(err.message);
+                            }
+                          }
+                      )
+                  }
+                  else
+                  {
+                      res.send(`Not mutual Connection between users ${user_A} and ${user_B} added successfully.`);
+                  }
+                }
+              )
+          }
         } catch (err) {
           console.log(err.message);
         }
@@ -95,12 +121,40 @@ module.exports = {
   deleteUsersConnection: (req, res) => {
     const user_A = req.params.useridA;
     const user_B = req.params.useridB;
+    const lastUpdate = new Date();
+
     mySqlConnection.query(
       "DELETE FROM Connections WHERE user_A_id = ? AND user_B_id = ?",
       [user_A, user_B],
       (err, result) => {
         try {
-          res.send("connection deleted successfully");
+          mySqlConnection.query(
+            `select * from connections where user_A_id = ${user_B} and user_B_id = ${user_A}`,
+            (err, rows) => {
+              try {
+                if(rows.length > 0)
+                {
+                  mySqlConnection.query(
+                    `update connections set connected = 0 where
+                    user_A_id = ${user_B} and user_B_id = ${user_A}`,
+                    (err, rows) => {
+                      try {
+                        res.send(`Oh no! There is no longer mutual connection between users ${user_A} and ${user_B}`);
+                      } catch (err) {
+                        console.log(err.message);
+                      }
+                    }
+                  )
+                }
+                else 
+                {
+                  res.send(`Connection between users ${user_A} and ${user_B} deleted successfully`)
+                }
+              } catch (err) {
+                console.log(err.message);
+              }
+            }
+          )
         } catch (err) {
           console.log(err.message);
         }
