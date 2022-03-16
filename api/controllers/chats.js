@@ -1,6 +1,4 @@
-//const mysql=require("mysql");
 const dbConfig = require("../../config/db_config");
-//const users = require("./users");
 const mySqlConnection = dbConfig;
 
 module.exports = {
@@ -8,7 +6,8 @@ module.exports = {
     mySqlConnection.query("SELECT * from Chats", (err, rows) => {
       try {
         res.send(rows);
-      } catch (err) {
+      } 
+      catch (err) {
         console.log(err.message);
       }
     });
@@ -23,7 +22,8 @@ module.exports = {
       (err, rows) => {
         try {
           res.send(rows);
-        } catch (err) {
+        } 
+        catch (err) {
           console.log(err.message);
         }
       }
@@ -36,17 +36,34 @@ module.exports = {
     const userIdB = req.params.useridB;
 
     mySqlConnection.query(
-      "INSERT INTO Chats (create_date, user_A_id, user_B_id) values (?, ?, ?)" +
-        "ON DUPLICATE KEY UPDATE user_A_id = ?, user_B_id = ?",
-      [currentDate, userIdA, userIdB, userIdA, userIdB],
-      (err, result) => {
+      `select * from connections where (user_A_id = ${userIdA} and user_B_id = ${userIdB} and connected = 1)`,
+      (err, rows) => {
         try {
-          res.send("chat added successfully");
-        } catch (err) {
+          if(rows.length > 0)
+          {
+            mySqlConnection.query(
+              "INSERT INTO Chats (create_date, user_A_id, user_B_id) values (?, ?, ?)" +
+                "ON DUPLICATE KEY UPDATE user_A_id = ?, user_B_id = ?",
+              [currentDate, userIdA, userIdB, userIdA, userIdB],
+              (err, rows) => {
+                try {
+                  res.send(`Chat between users ${userIdA} and ${userIdB} added successfully.`);
+                } catch (err) {
+                  console.log(err.message);
+                }
+              }
+            )
+          }
+          else 
+          {
+            res.send(`Chat not added. There is no mutual connection between users ${userIdA} and ${userIdB}.`);
+          }
+        } 
+        catch (err) {
           console.log(err.message);
         }
       }
-    );
+    )
   },
 
   deleteUsersChat: (req, res) => {
@@ -57,9 +74,11 @@ module.exports = {
       "DELETE FROM Chats WHERE user_A_id = ? AND user_B_id = ?",
       [userIdA, userIdB],
       (err, result) => {
-        try {
+        try 
+        {
           res.send("chat deleted successfully");
-        } catch (err) {
+        } 
+        catch (err) {
           console.log(err.message);
         }
       }
