@@ -38,7 +38,7 @@ module.exports={
         let longitude = req.body.longitude;
         let latitude = req.body.latitude;
 
-        mySqlConnection.query(`INSERT INTO user_configuration (user_id, first_name, last_name, date_of_birth, city, gender, phone_number, registration_date, relationship_status, search_mode, sexual_orientation, profession, pronoun, interested_in, hobbies_filter, radius, longitude, latitude) VALUES ("${user_id}","${first_name}","${last_name}","${dateOfBirth}","${city}","${gender}","${phoneNumber}","${registerDate}","${relationship_status}","${search_mode}","${sexual_orientation}","${profession}","${pronoun}","${interested_in}", "${hobbies}" ,"${radius}","${longitude}","${latitude}")`,(err,result)=> {
+        mySqlConnection.query(`INSERT INTO user_configuration (user_id, first_name, last_name, date_of_birth, city, gender, phone_number, registration_date, relationship_status, search_mode, sexual_orientation, profession, pronoun, interested_in, hobbies, radius, longitude, latitude) VALUES ("${user_id}","${first_name}","${last_name}","${dateOfBirth}","${city}","${gender}","${phoneNumber}","${registerDate}","${relationship_status}","${search_mode}","${sexual_orientation}","${profession}","${pronoun}","${interested_in}", "${hobbies}" ,"${radius}","${longitude}","${latitude}")`,(err,result)=> {
            if(!err)
            {
                res.send("user configuration of user added successfully");
@@ -70,7 +70,7 @@ module.exports={
         let city=req.body.city;
         let gender=req.body.gender;
         let phoneNumber = req.body.phoneNumber;
-        let registerDate=formatYmd(new Date(req.body.registerDate));
+        let registerDate=formatYmd(new Date());
         let relationship_status = req.body.relationship_status;
         let search_mode = req.body.search_mode;
         let sexual_orientation = req.body.sexual_orientation;
