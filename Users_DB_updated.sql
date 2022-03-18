@@ -6,35 +6,19 @@ SET NAMES utf8 ;
 SET character_set_client = utf8mb4 ;
 
 CREATE TABLE Users (
-  user_id int NOT NULL AUTO_INCREMENT,
-  email varchar(50),
-  first_name varchar(50),
-  last_name varchar(50),
-  password varchar(500),
-  date_of_birth DATE,
-  address varchar(50),
-  gender enum('Woman','Man', 'prefer not to say'), 
-  phone_number varchar(50),
-  registration_date DATE,
+  user_id int NOT NULL AUTO_INCREMENT unique,
+  email varchar(500) not null,
+  password varchar(500) not null,
+  socket_id int not null,
+  login_status tinyint not null default '0',
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-INSERT INTO users VALUES (1, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-INSERT INTO users VALUES (2, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-INSERT INTO users VALUES (3, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-INSERT INTO users VALUES (4, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-INSERT INTO users VALUES (5, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-INSERT INTO users VALUES (6, "nvjkfnsxfnsl@gmail", "Mor", "Zemach", "123456", curdate(), "fhskbk", 1, "6942652", curdate());
-
-CREATE TABLE Chats (
-  create_date date NOT NULL,
-  user_A_id int NOT NULL,
-  user_B_id int NOT NULL,
-  PRIMARY KEY (user_A_id, user_B_id),
-  foreign key (user_A_id) references Users (user_id),
-  foreign key (user_B_id) references Users (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-INSERT INTO Chats VALUES (curdate(), 1, 2);
-INSERT INTO Chats VALUES (curdate(), 2, 3);
+INSERT INTO users (email, password, socket_id) VALUES ("nvjkfnsxfnsl@gmail", "123456", 11);
+INSERT INTO users (email, password, socket_id) VALUES ("nvjkfnsl@gmail", "123456", 22);
+INSERT INTO users (email, password, socket_id) VALUES ("fnsxfnsl@gmail", "123456", 33);
+INSERT INTO users (email, password, socket_id) VALUES ("nvjkfnsxfnsl@walla", "fhskbk", 44);
+INSERT INTO users (email, password, socket_id) VALUES ("nvsl@gmail", "fhskbk", 55);
+INSERT INTO users (email, password, socket_id) VALUES ("njjjj@gmail", "123456", 66);
 
 CREATE TABLE Connections (
   user_A_id int NOT NULL,
@@ -47,8 +31,18 @@ CREATE TABLE Connections (
   foreign key (user_B_id) references Users (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 INSERT INTO Connections VALUES (1, 2, 1, curdate(), curdate());
-INSERT INTO Connections VALUES (2, 3, 1, curdate(), curdate());
+INSERT INTO Connections VALUES (2, 3, 0, curdate(), curdate());
 INSERT INTO Connections VALUES (1, 3, 0, curdate(), curdate());
+INSERT INTO Connections VALUES (2, 1, 1, curdate(), curdate());
+
+CREATE TABLE Chats (
+  create_date date not null,
+  user_A_id int NOT NULL,
+  user_B_id int NOT NULL,
+  foreign key (user_A_id) references connections (user_A_id),
+  foreign key (user_B_id) references connections (user_B_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+INSERT INTO Chats VALUES (curdate(), 2, 3);
 
 CREATE TABLE Notifications (
   notification_id int NOT NULL AUTO_INCREMENT,
@@ -64,13 +58,20 @@ INSERT INTO Notifications (user_id, content, sent_from, creation_date) VALUES (1
 
 CREATE TABLE user_configuration (
   user_id int NOT NULL,
+  first_name varchar(100),
+  last_name varchar(100),
+  date_of_birth DATE,
+  city varchar(200),
+  gender enum('Woman','Man', 'prefer not to say'), 
+  phone_number varchar(11),
+  registration_date DATE,
   relationship_status enum('single', 'in a relationship', 'engaged', 'married', 'in an open relationship', 'widowed', 'divorced') default null,
   search_mode enum('whatever', 'beer', 'study', 'food', 'training', 'coffee', 'shopping') default 'whatever',
   sexual_orientation enum('Heterosexual','Bisexual','Homosexual','Pansexual', 'Asexual','prefer not define') default 'prefer not define',
-  profession varchar(50),
+  profession varchar(200),
   pronoun enum('she/her','he/him','they/them','prefer not to say') default 'prefer not to say',
   interested_in set('friends','hookup','short term relationship', 'long term relationship', 'study buddy', 'sport buddy', 'work buddy') default null,
-  hobbies_filter set('swimming', 'yoga', 'pilates', 'running', 'surfing', 'dancing', 'cooking', 'baking', 'painting', 'handicraft', 'reading', 'blogging', 'journaling', 'gardening',
+  hobbies set('swimming', 'yoga', 'pilates', 'running', 'surfing', 'dancing', 'cooking', 'baking', 'painting', 'handicraft', 'reading', 'blogging', 'journaling', 'gardening',
   'hiking', 'shopping', 'camping', 'interested in culinary', 'interested in medicine and biology', 'playing video games', 'skippering and sailing', 'traveling', 'slacklining',
   'playing basketball', 'playing football/soccer', 'playing beach volleyball', 'tanning', 'playing tennis', 'going to the gym', 'juggling', 'acting', 'fashion designing', 
   'home decorating', 'puzzeling', 'learning a new languages', 'listening to podcasts', 'singing', 'playing guitar', 'playing synthesizer', 'playing drums', 
