@@ -143,9 +143,21 @@ module.exports = {
         interestingInFilter,
         ageFilter,
       ],
-      (err, result) => {
+      (err, rows) => {
         try {
-          res.send(`User number ${userid} added filters successfully`);
+            mySqlConnection.query(
+              `select first_name from user_configuration where user_id = ${userid}`,
+              (err, rows) => {
+                try {
+                  const userName = rows[0].first_name;
+                  msgToClient = {msg: `${userName}'s filters are now updated!`};
+                  return res.send(msgToClient);
+                } 
+                catch (err) {
+                  console.log(err.message);
+                }
+              }
+            )
         } catch (err) {
           console.log(err.message);
         }

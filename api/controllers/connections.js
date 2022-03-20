@@ -126,7 +126,20 @@ module.exports = {
                           (user_A_id = ${user_B} and user_B_id = ${user_A}))`,
                           (err, rows) => {
                             try {
-                              res.send(`Congrats! there is a new mutual connection between users ${user_A} and ${user_B}`);
+                              mySqlConnection.query(
+                                `select first_name from user_configuration where user_id = ${user_A} or user_id = ${user_B}`,
+                                (err, rows) => {
+                                  try {
+                                    const user_A_Name = rows[0].first_name;
+                                    const user_B_Name = rows[1].first_name;
+                                    msgToClient = {msg: `Congrats! there is a new mutual connection between ${user_A_Name} and ${user_B_Name}! Would you like starting a new chat?`};
+                                    return res.send(msgToClient);
+                                  } 
+                                  catch (err) {
+                                    console.log(err.message);
+                                  }
+                                }
+                              )
                             } catch (err) {
                               console.log(err.message);
                             }
@@ -135,7 +148,20 @@ module.exports = {
                   }
                   else
                   {
-                      res.send(`Not mutual Connection between users ${user_A} and ${user_B} added successfully.`);
+                    mySqlConnection.query(
+                      `select first_name from user_configuration where user_id = ${user_A} or user_id = ${user_B}`,
+                      (err, rows) => {
+                        try {
+                          const user_A_Name = rows[0].first_name;
+                          const user_B_Name = rows[1].first_name;
+                          msgToClient = {msg: `Not mutual Connection between ${user_A_Name} and ${user_B_Name} is now exists.`};
+                          return res.send(msgToClient);
+                        } 
+                        catch (err) {
+                          console.log(err.message);
+                        }
+                      }
+                    )
                   }
                 }
               )
@@ -168,7 +194,20 @@ module.exports = {
                     user_A_id = ${user_B} and user_B_id = ${user_A}`,
                     (err, rows) => {
                       try {
-                        res.send(`Oh no! There is no longer mutual connection between users ${user_A} and ${user_B}`);
+                        mySqlConnection.query(
+                          `select first_name from user_configuration where user_id = ${user_A} or user_id = ${user_B}`,
+                          (err, rows) => {
+                            try {
+                              const user_A_Name = rows[0].first_name;
+                              const user_B_Name = rows[1].first_name;
+                              msgToClient = {msg: `Oh no! There is no longer mutual connection between ${user_A_Name} and ${user_B_Name}`};
+                              return res.send(msgToClient);
+                            } 
+                            catch (err) {
+                              console.log(err.message);
+                            }
+                          }
+                        )
                       } catch (err) {
                         console.log(err.message);
                       }
@@ -177,7 +216,20 @@ module.exports = {
                 }
                 else 
                 {
-                  res.send(`Connection between users ${user_A} and ${user_B} deleted successfully`)
+                  mySqlConnection.query(
+                    `select first_name from user_configuration where user_id = ${user_A} or user_id = ${user_B}`,
+                    (err, rows) => {
+                      try {
+                        const user_A_Name = rows[0].first_name;
+                        const user_B_Name = rows[1].first_name;
+                        msgToClient = {msg: `Connection between ${user_A_Name} and ${user_B_Name} is no longer exists.`};
+                        return res.send(msgToClient);
+                      } 
+                      catch (err) {
+                        console.log(err.message);
+                      }
+                    }
+                  )
                 }
               } catch (err) {
                 console.log(err.message);

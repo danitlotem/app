@@ -47,7 +47,21 @@ module.exports = {
               [currentDate, userIdA, userIdB, userIdA, userIdB],
               (err, rows) => {
                 try {
-                  res.send(`Chat between users ${userIdA} and ${userIdB} added successfully.`);
+                  mySqlConnection.query(
+                    `select first_name from user_configuration where user_id = ${userIdA} or user_id = ${userIdB}`,
+                    (err, rows) => {
+                      try {
+                        const user_A_Name = rows[0].first_name;
+                        const user_B_Name = rows[1].first_name;
+                        msgToClient = {msg: `Chat between ${user_A_Name} and ${user_B_Name} is now exists, lets chat!`};
+                        return res.send(msgToClient);
+                      } 
+                      catch (err) {
+                        console.log(err.message);
+                      }
+                    }
+                  )
+                  // res.send(`Chat between users ${userIdA} and ${userIdB} added successfully.`);
                 } catch (err) {
                   console.log(err.message);
                 }
@@ -56,7 +70,9 @@ module.exports = {
           }
           else 
           {
-            res.send(`Chat not added. There is no mutual connection between users ${userIdA} and ${userIdB}.`);
+            msgToClient = {msg: `Chat not added. There is no mutual connection between users ${userIdA} and ${userIdB}.`};
+            return res.send(msgToClient);
+            // res.send(`Chat not added. There is no mutual connection between users ${userIdA} and ${userIdB}.`);
           }
         } 
         catch (err) {
