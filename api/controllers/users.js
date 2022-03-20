@@ -1,132 +1,95 @@
-const dbConfig = require("../../config/db_config");
+const dbConfig = require('../../config/db_config');
 const mySqlConnection = dbConfig;
 
-const formatYmd = (date) => date.toISOString().slice(0, 10);
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return d;
+  }
+  
+  function deg2rad(deg) {
+    return deg * (Math.PI/180)
+  }
 
-module.exports = {
-  getAllUsers: (req, res) => {
-    mySqlConnection.query("SELECT* from users", (err, rows) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    });
-  },
-  getOneUser: (req, res) => {
-    mySqlConnection.query(
-      "SELECT * from users WHERE user_id= ?",
-      [req.params.userid],
-      (err, rows) => {
-        if (!err) {
-          res.send(rows);
-        } else {
-          console.log(err);
-        }
-      }
-    );
-  },
-  // createUser: (req,res)=>{
-  //     let app_id=12; //need to generate app_id
-  //     let facebood_id = req.body.facebood_id;
-  //     let phoneNumber=req.body.phoneNumber;
-  //     let searchModeId = req.body.searchModeId;
-  //     let releationshipId=req.body.releationshipId;
-  //     let interestdIn=req.body.interestdIn;
-  //     let radius=req.body.radius;
-  //     let olderThan18=req.body.olderThan18;
-  //     let registerDate=formatYmd(new Date(req.body.registerDate));
-  //     let longitude = req.body.longitude;
-  //     let latitude=req.body.latitude;
+module.exports= {
+    getAllUsers: (req,res) => {
+        mySqlConnection.query("SELECT* from users", (err,rows)=>{
+            if(!err)
+            {
+                res.send(rows);
+            }
+            else
+            {
+                console.log(err);
+            }
+        })
+    },
+    getOneUser: (req,res) => {
+        //mySqlConnection.query("SELECT * from users WHERE user_id= ?",[req.params.userid], (err,rows)=>{
+            const arr = (req.params.userid).split(",");
+            mySqlConnection.query("SELECT * from users WHERE user_id IN (?)",[arr], (err,rows)=>{
+            if(!err)
+            {
+                res.send(rows);
+            }
+            else
+            {
+                console.log(err);
+            }
+        })
+    },
 
-  //     //need to search if email exist
+    getUsersByRadius: (req,res) =>
+    {
+        let radius = req.params.radius;
+        mySqlConnection.query("SELECT user_id, ( 3959 * acos ( cos ( radians(31.589167) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(64.363333) ) + sin ( radians(31.589167) ) * sin( radians( latitude ) ) ) ) AS distance FROM user_configuration HAVING (distance < 1000)", (err,rows)=>
+        {
+            if(!err)
+            {
+                res.send(rows);
+            }
+            else
+            {
+                console.log(err);
+            }
+        })
+    },
+    
+    deleteUser: (req,res) => {
+        mySqlConnection.query("DELETE FROM users WHERE user_id=?",req.params.userid, (err,resuls)=>{
+            if(!err)
+            {
+               res.send("user deleted successfully");
+            }
+            else
+            {
+                console.log(err);
+            }
+        })
+    },
+    updateUser: (req,res) => {
+        let user_id= req.params.userid;
+        let email = req.body.email;
 
-  //     mySqlConnection.query(`INSERT INTO users (app_id, facebook_id, phone_number, search_Mode_id, relationship_id, interesting_in_id, radius, older_then_18, registration_date, longitude, latitude) VALUES ("${app_id}","${facebood_id}","${phoneNumber}","${searchModeId}","${releationshipId}", "${interestdIn}", "${radius}", "${olderThan18}", "${registerDate}","${longitude}","${latitude}")`,(err,result)=> {
-  //        if(!err)
-  //        {
-  //            res.send("user added successfully");
-  //        }
-  //        else
-  //        {
-  //            console.log(err);
-  //        }
-  //     })
-  // },
-  createUser: (req, res) => {
-    let user_id = 10; //need to generate app_id
-    let email = req.body.email;
-    let first_name = req.body.first_name;
-    let last_name = req.body.last_name;
-    let password = req.body.password;
-    let dateOfBirth = formatYmd(new Date(req.body.dateOfBirth));
-    let address = req.body.address;
-    let gender = req.body.gender;
-    let phoneNumber = req.body.phoneNumber;
-    let registerDate = formatYmd(new Date(req.body.registerDate));
-
-
-    //need to search if email exist
-
-    mySqlConnection.query(
-      `INSERT INTO users (user_id, email, first_name, last_name, password, date_of_birth, address, gender, phone_number, registration_date)
-       VALUES ("${user_id}","${email}","${first_name}","${last_name}","${password}", "${dateOfBirth}", "${address}", "${gender}",
-      "${phoneNumber}","${registerDate}")`,
-      (err, result) => {
-        if (!err) {
-          res.send("user added successfully");
-        } else {
-          console.log(err);
-        }
-      }
-    );
-  },
-  deleteUser: (req, res) => {
-    mySqlConnection.query(
-      "DELETE FROM users WHERE user_id=?",
-      req.params.userid,
-      (err, resuls) => {
-        if (!err) {
-          res.send("user deleted successfully");
-        } else {
-          console.log(err);
-        }
-      }
-    );
-  },
-  updateUser: (req, res) => {
-    let user_id = 10; //need to generate app_id
-    let email = req.body.email;
-    let first_name = req.body.first_name;
-    let last_name = req.body.last_name;
-    let password = req.body.password;
-    let dateOfBirth = formatYmd(new Date(req.body.dateOfBirth));
-    let address = req.body.address;
-    let gender = req.body.gender;
-    let phoneNumber = req.body.phoneNumber;
-    let registerDate = formatYmd(new Date(req.body.registerDate));
-    mySqlConnection.query(
-      "UPDATE users SET user_id=?, email=?, first_name=?, last_name=?, password=?, dateOfBirth=?, address=?, gender=?," +
-       "phone_number=?, registration_date=?  WHERE user_id=?",
-      [
-        user_id,
-        email,
-        first_name,
-        last_name,
-        password,
-        dateOfBirth,
-        address,
-        gender,
-        phoneNumber,
-        registerDate,
-        req.params.userid,
-      ],
-      (err, result) => {
-        if (!err) {
-          res.send("user updated successfully");
-        } else {
-          console.log(err);
-        }
-      }
-    );
-  },
-};
+        let hashedPassword = bcrypt.hash(req.body.password,10);
+    
+        mySqlConnection.query("UPDATE users SET email=?, password=? WHERE user_id=?", [email, hashedPassword, user_id], (err,result)=> {
+            if(!err)
+            {
+               res.send("user updated successfully");
+            }
+            else
+            {
+                console.log(err);
+            }
+        })
+}
+}
