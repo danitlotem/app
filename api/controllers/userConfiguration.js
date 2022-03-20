@@ -6,7 +6,9 @@ const formatYmd = date => date.toISOString().slice(0, 10);
 
 module.exports={
     getUserConfiguration: (req,res) => {
-        mySqlConnection.query("SELECT* from user_configuration WHERE user_id=?",[req.params.userid], (err,rows)=>{
+        const arr = (req.params.userid).split(",");
+        mySqlConnection.query("SELECT * from user_configuration WHERE user_id IN (?)",[arr], (err,rows)=>{
+        //mySqlConnection.query("SELECT* from user_configuration WHERE user_id=?",[req.params.userid], (err,rows)=>{
             if(!err)
             {
                 res.send(rows);
