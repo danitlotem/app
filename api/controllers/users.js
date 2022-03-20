@@ -33,7 +33,9 @@ module.exports= {
         })
     },
     getOneUser: (req,res) => {
-        mySqlConnection.query("SELECT * from users WHERE user_id= ?",[req.params.userid], (err,rows)=>{
+        //mySqlConnection.query("SELECT * from users WHERE user_id= ?",[req.params.userid], (err,rows)=>{
+            const arr = (req.params.userid).split(",");
+            mySqlConnection.query("SELECT * from users WHERE user_id IN (?)",[arr], (err,rows)=>{
             if(!err)
             {
                 res.send(rows);
