@@ -1,4 +1,5 @@
 const dbConfig = require("../../config/db_config");
+const { getUsersWithCommonRelationshipFilter } = require("./filters");
 const mySqlConnection = dbConfig;
 
 module.exports = {
@@ -48,7 +49,21 @@ module.exports = {
       [user, user],
       (err, rows) => {
         try {
-          res.send(rows);
+
+          let userConnections = [];
+          const rowsLength = rows.length;
+
+          for(i = 0; i < rowsLength; i++)
+          {
+            if(!userConnections.includes(rows[i].user_A_id) && rows[i].user_A_id !== parseInt(user, 10)) {
+              userConnections.push(rows[i].user_A_id);
+            }
+            else if(!userConnections.includes(rows[i].user_B_id) && rows[i].user_B_id !== parseInt(user, 10)) {
+              userConnections.push(rows[i].user_B_id);
+            }
+          }
+
+          res.send(userConnections);
         } catch (err) {
           console.log(err.message);
         }
@@ -63,7 +78,21 @@ module.exports = {
       [user, user],
       (err, rows) => {
         try {
-          res.send(rows);
+
+          let userConnectedConnections = [];
+          const rowsLength = rows.length;
+
+          for(i = 0; i < rowsLength; i++)
+          {
+            if(!userConnectedConnections.includes(rows[i].user_A_id) && rows[i].user_A_id !== parseInt(user, 10)) {
+              userConnectedConnections.push(rows[i].user_A_id);
+            }
+            else if(!userConnectedConnections.includes(rows[i].user_B_id) && rows[i].user_B_id !== parseInt(user, 10)) {
+              userConnectedConnections.push(rows[i].user_B_id);
+            }
+          }
+
+          res.send(userConnectedConnections);
         } catch (err) {
           console.log(err.message);
         }
