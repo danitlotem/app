@@ -41,7 +41,6 @@ module.exports={
         let phoneNumber = req.body.phone_number;
         let registerDate=formatYmd(new Date());
         let relationship_status = req.body.relationship_status;
-        let search_mode = req.body.search_mode;
         let sexual_orientation = req.body.sexual_orientation;
         let profession = req.body.profession;
         let pronoun = req.body.pronoun;
@@ -51,7 +50,7 @@ module.exports={
         let longitude = req.body.longitude;
         let latitude = req.body.latitude;
 
-        mySqlConnection.query(`INSERT INTO user_configuration (user_id, first_name, last_name, date_of_birth, city, gender, phone_number, registration_date, relationship_status, search_mode, sexual_orientation, profession, pronoun, interested_in, hobbies, radius, longitude, latitude) VALUES ("${user_id}","${first_name}","${last_name}","${dateOfBirth}","${city}","${gender}","${phoneNumber}","${registerDate}","${relationship_status}","${search_mode}","${sexual_orientation}","${profession}","${pronoun}","${interested_in}", "${hobbies}" ,"${radius}","${longitude}","${latitude}")`,(err,result)=> {
+        mySqlConnection.query(`INSERT INTO user_configuration (user_id, first_name, last_name, date_of_birth, city, gender, phone_number, registration_date, relationship_status, sexual_orientation, profession, pronoun, interested_in, hobbies, radius, longitude, latitude) VALUES ("${user_id}","${first_name}","${last_name}","${dateOfBirth}","${city}","${gender}","${phoneNumber}","${registerDate}","${relationship_status}","${sexual_orientation}","${profession}","${pronoun}","${interested_in}", "${hobbies}" ,"${radius}","${longitude}","${latitude}")`,(err,result)=> {
            if(!err)
            {
                res.send("user configuration of user added successfully");
@@ -95,7 +94,7 @@ module.exports={
         let longitude = req.body.longitude;
         let latitude = req.body.latitude;
 
-        mySqlConnection.query("UPDATE user_configuration SET first_name=?, last_name=?, password=?, dateOfBirth=?, city=?, gender=?, phone_number=?, registration_date=?, relationship_status=?, search_mode=?, sexual_orientation=?, profession=?, pronoun=?, interested_in=?, hobbies=? ,radius=?, longitude=?, latitude=? WHERE user_id=?", [first_name, last_name,  dateOfBirth, city, gender, phonenumber, registration_date, relationship_status,search_mode,sexual_orientation,profession,pronoun,interested_in, hobbies ,radius,longitude,latitude,req.params.user_id], (err,result)=> {
+        mySqlConnection.query("UPDATE user_configuration SET first_name=?, last_name=?, password=?, dateOfBirth=?, city=?, gender=?, phone_number=?, registration_date=?, relationship_status=?, search_mode=?, sexual_orientation=?, profession=?, pronoun=?, interested_in=?, hobbies=? ,radius=?, longitude=?, latitude=? WHERE user_id=?", [first_name, last_name,  dateOfBirth, city, gender, phoneNumber, registerDate, relationship_status,search_mode,sexual_orientation,profession,pronoun,interested_in, hobbies ,radius,longitude,latitude,req.params.user_id], (err,result)=> {
             if(!err)
             {
                res.send("user configuration updated successfully");
@@ -105,5 +104,29 @@ module.exports={
                 console.log(err);
             }
         }) 
+    },
+    updateSearchMode: (req,res) =>
+    {
+        let searchMode = req.body.search_mode;
+        mySqlConnection.query("SELECT * from user_configuration where user_id=?", req.params.userid, (err,rows) =>
+        {
+            if(!err)
+            {
+                if(rows.length>0)
+                {
+                    mySqlConnection.query("UPDATE user_configuration SET search_mode=? WHERE user_id=?", [searchMode,req.params.userid], (err,results)=>
+                    {
+                        if(!err)
+                        {
+                            res.send("Search mode updated");
+                        }
+                        else
+                        {
+                            console.log(err);
+                        }
+                    })
+                }
+            }
+        })
     }
 }
