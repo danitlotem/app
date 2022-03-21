@@ -12,11 +12,14 @@ module.exports={
             {
                 if(rows.length>0)
                 {
-                    var dob = rows[0].date_of_birth;
-                    var diff_ms = Date.now() - dob;
-                    var age_dt = new Date(diff_ms); 
-                    var age= Math.abs(age_dt.getUTCFullYear() - 1970);
-                    rows[0].age = age;
+                    for(let i=0; i<rows.length; i++)
+                    {
+                        var dob = rows[i].date_of_birth;
+                        var diff_ms = Date.now() - dob;
+                        var age_dt = new Date(diff_ms); 
+                        var age= Math.abs(age_dt.getUTCFullYear() - 1970);
+                        rows[i].age = age;
+                    }
                 }
                 
                 res.send(rows);
