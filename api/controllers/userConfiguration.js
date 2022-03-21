@@ -8,9 +8,17 @@ module.exports={
     getUserConfiguration: (req,res) => {
         const arr = (req.params.userid).split(",");
         mySqlConnection.query("SELECT * from user_configuration WHERE user_id IN (?)",[arr], (err,rows)=>{
-        //mySqlConnection.query("SELECT* from user_configuration WHERE user_id=?",[req.params.userid], (err,rows)=>{
             if(!err)
             {
+                if(rows.length>0)
+                {
+                    var dob = rows[0].date_of_birth;
+                    var diff_ms = Date.now() - dob;
+                    var age_dt = new Date(diff_ms); 
+                    var age= Math.abs(age_dt.getUTCFullYear() - 1970);
+                    rows[0].age = age;
+                }
+                
                 res.send(rows);
             }
             else
