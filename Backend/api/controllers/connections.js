@@ -63,7 +63,27 @@ module.exports = {
             }
           }
 
-          res.send(userConnections);
+          let queryForConfigurationTable = "select * from user_configuration where (user_id = ";
+          // create the query for getting all details from user_configurations table by user_id
+          for(i = 0; i < userConnections.length; i++)
+          {
+            if(i + 1 === userConnections.length) {
+              queryForConfigurationTable = queryForConfigurationTable.concat(userConnections[i], ")");
+            }
+            else {
+                queryForConfigurationTable = queryForConfigurationTable.concat(userConnections[i], " or user_id = "); 
+            }
+          }
+
+          mySqlConnection.query(queryForConfigurationTable, (err, rows) => {
+            try {
+              res.send(rows);
+            } 
+            catch (err) {
+                console.log(err.message);  
+            }
+          });
+
         } catch (err) {
           console.log(err.message);
         }
@@ -92,7 +112,27 @@ module.exports = {
             }
           }
 
-          res.send(userConnectedConnections);
+          let queryForConfigurationTable = "select * from user_configuration where (user_id = ";
+          // create the query for getting all details from user_configurations table by user_id
+          for(i = 0; i < userConnectedConnections.length; i++)
+          {
+            if(i + 1 === userConnectedConnections.length) {
+              queryForConfigurationTable = queryForConfigurationTable.concat(userConnectedConnections[i], ")");
+            }
+            else {
+                queryForConfigurationTable = queryForConfigurationTable.concat(userConnectedConnections[i], " or user_id = "); 
+            }
+          }
+
+          mySqlConnection.query(queryForConfigurationTable, (err, rows) => {
+            try {
+              res.send(rows);
+            } 
+            catch (err) {
+                console.log(err.message);  
+            }
+          });
+
         } catch (err) {
           console.log(err.message);
         }
